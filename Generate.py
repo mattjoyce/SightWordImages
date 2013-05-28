@@ -4,6 +4,7 @@ import string
 from PIL import Image, ImageDraw, ImageFont 
 from  random import random
 import colorsys
+import optparse
 
 def generate(im_width, im_height, text, img_scale, fontname):
     """Create a new jpg file.
@@ -31,13 +32,24 @@ def generate(im_width, im_height, text, img_scale, fontname):
     draw.text(((im_width-text_width) / 2, (im_height-text_height) / 2), 
                 text, fill = (color_rgb), font=font)
     filename = text.translate(string.maketrans("",""), string.punctuation)
-    new_image.save(filename+".jpg", "jpeg")
+    new_image.save(filename+".jpg", "jpeg",quality=90)
 
 def main(argv=None):
     """ Read a text file, take each line and create a image file"""
-    lines = open("test.txt").readlines()
+    parser = optparse.OptionParser()
+    parser.add_option('-y', '--height', dest='y', type='int', 
+                        help="Vertical size of images in pixels", default='800' )
+    parser.add_option('-x', '--width', dest='x', type='int',  
+                        help="Horizontal size of images in pixels", default='600' )
+    parser.add_option("-t", "--infile", dest="infile", default='text.txt',
+                  help="FILE containing text, one item per line", metavar="FILE")
+    parser.add_option("-f", "--font", dest="font", default='comic.ttf',
+                  help="truetype font FILE", metavar="FILE")
+    (options, args) = parser.parse_args()
+    
+    lines = open(options.infile).readlines()
     for line in lines:
-        generate(480, 234, line, 1, "comic.ttf")
+        generate(options.x, options.y, line, 1, options.font)
 
 if __name__ == "__main__":
     sys.exit(main())
